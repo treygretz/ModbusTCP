@@ -24,6 +24,7 @@ def run_gui():
     sw, sh = root.winfo_screenwidth(), root.winfo_screenheight()
     x, y = (sw - width) // 2, (sh - height) // 2
     root.geometry(f"{width}x{height}+{x}+{y}")
+    root.configure(background="#C7C7C7")
 
     # GUI layout
     Label(root, text="Modbus Server Control", font=("Arial", 18, "bold")).grid(row=0, column=0, columnspan=2, sticky='w')
@@ -33,6 +34,7 @@ def run_gui():
     Button(root, text="Upload Python File", command=handle_file_upload).grid(row=1, column=2, padx=5)
 
     text_widget = ScrolledText(root, width=100, height=20)
+    text_widget.configure(background="#C7C7C7")
     text_widget.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
     # Redirect stdout

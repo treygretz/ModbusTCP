@@ -4,14 +4,14 @@ import queue
 import datetime
 import evdev
 from pyModbusTCP.client import ModbusClient
-from config import MODBUS_HOST, MODBUS_PORT
+from config import MODBUS_HOST, MODBUS_PORT, FLASK_HOST, FLASK_PORT
 import subprocess
 import flask
 import requests
 
-# Constants (add your actual values)
-URL = "http://your-update-server.com/firmware.bin"
-SAVE_AS = "/home/oishii/firmware.bin"
+# Constants
+URL = "http://" + FLASK_HOST + ":" + str(FLASK_PORT) + "/file"
+SAVE_AS = "/home/oishii/Python/Barcode_Thread_Worker.py"
 
 # Global events
 scanner_event = threading.Event()
@@ -63,7 +63,7 @@ def getDevices(scanner_queue):
 def getConnectedToServer(client_queue):
     while not retry_event.is_set():
         try:
-            client = ModbusClient(host=MODBUS_HOST, port=MODBUS_PORT, auto_open=True, timeout=1)
+            client = ModbusClient(host='10.190.54.222', port=502, auto_open=True, timeout=5)
             if client.open():
                 print("Server connection found!")
                 client_queue.put(client)
@@ -71,7 +71,8 @@ def getConnectedToServer(client_queue):
                 return
             else:
                 print("Attempting reconnection to Server...")
-                time.sleep(2)
+                print(client.last_error_as_txt)
+                time.sleep(5)
         except Exception as Ex:
             print(f"Error in getConnectedToServer(): {Ex}")
             time.sleep(2)
@@ -88,8 +89,7 @@ def sendPulse(client, retry_event):
 
         serverIPRegister = parseIPtoRegister()
         IPlist = client.read_holding_registers(1051, 26)
-        print(IPlist)
-        print(client.is_open)
+        print(f"{IPlist}\n")
         PulseRegister = None
 
         for IP in IPlist:
@@ -156,12 +156,15 @@ def checkForUpdates(client, retry_event):
     while not retry_event.is_set():
         try:
             print("Checking for updates...")
-            if client.read_holding_registers(1000) == 1:
+            # The function read_holding_registers returns a list for the Modbus Client so it just checks the first index of that list to determine if the server set the flag high
+            if client.read_holding_registers(1000, 1)[0] == 1:
+                print("Update Found")
                 response = requests.get(URL)
                 if response.status_code == 200:
                     with open(SAVE_AS, 'wb') as f:
                         f.write(response.content)
                     print(f"File downloaded and saved as '{SAVE_AS}'")
+                    time.sleep(30)
                 else:
                     print(f"Failed to download file. Server responded with status code {response.status_code}")
             time.sleep(10)
@@ -206,7 +209,7 @@ def continuousRun():
         scanner = scanner_queue.get()
         client = client_queue.get()
 
-        print("Starting worker threads...")
+        print("Starting worker threads...\n")
         # Step 2: Start all worker threads as daemon threads
         pulse_thread = threading.Thread(target=thread_worker, args=[sendPulse, client, retry_event], daemon=True)
         barcode_thread = threading.Thread(target=thread_worker, args=[updateServerBarcodeRegisters, scanner, client, retry_event], daemon=True)
