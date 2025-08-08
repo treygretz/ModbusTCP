@@ -9,6 +9,10 @@ DESTINATION_FILEPATH = "/home/oishii/Python/ModbusTCPVenv/ModbusTCP/Client/Barco
 def overwriteFile():
 	if os.path.exists(SOURCE_FILEPATH):
 		shutil.copy2(SOURCE_FILEPATH, DESTINATION_FILEPATH)
+		print("File updated!\n")
+
+	else:
+		print("No Updates Avialable...\n")
 
 if __name__ == "__main__":
 	overwriteFile()

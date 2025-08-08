@@ -14,4 +14,5 @@ TRANSFER_DELAY = 15
 
 MODBUS_STARTING_REGISTER = 1001
 TOTAL_CLIENTS = 32
-CLIENT_IP_RANGE = (1, 32)
+# Have to include the + 1 to bring the IP range up to the correct end value
+CLIENT_IP_RANGE = (1, 32 + 1)

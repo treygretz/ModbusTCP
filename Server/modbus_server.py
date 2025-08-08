@@ -34,10 +34,10 @@ class ModbusServerThread:
             print("IP addresses stored in registers.")
 
             while not self.stop_event.is_set():
-                for i in range(TOTAL_CLIENTS):
+                for i in range(*CLIENT_IP_RANGE):
                     data = self.server.data_bank.get_holding_registers(i * 10, 9)
                     if data and data[0] != 0:
-                        print(f"Data read from holding registers: {data}")
+                        print(f"Data read from holding registers {i*10} -> {(i * 10) + 9}: {data}")
                 print(f"CPU Usage: {psutil.cpu_percent(interval=1)}%")
                 try:
                     status = self.server.data_bank.get_holding_registers(1000)

@@ -1,3 +1,4 @@
+#12:09
 import threading
 import time
 import queue
@@ -135,7 +136,7 @@ def updateServerBarcodeRegisters(scanner, client, retry_event):
                         QRregister = None
                         for IP in IPlist:
                             if IP == serverIPRegister:
-                                QRregister = IPlist.index(IP)
+                                QRregister = (IPlist.index(IP))+1
                         dt = datetime.datetime.now()
                         current_value = client.read_holding_registers(QRregister * 10, 1)
                         if current_value != [int(barcode)]:
@@ -164,7 +165,8 @@ def checkForUpdates(client, retry_event):
                     with open(SAVE_AS, 'wb') as f:
                         f.write(response.content)
                     print(f"File downloaded and saved as '{SAVE_AS}'")
-                    time.sleep(30)
+                    time.sleep(15)
+                    subprocess.run(["sudo", "reboot", "now"])
                 else:
                     print(f"Failed to download file. Server responded with status code {response.status_code}")
             time.sleep(10)
