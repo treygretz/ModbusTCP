@@ -10,6 +10,7 @@ def overwriteFile():
 	if os.path.exists(SOURCE_FILEPATH):
 		shutil.copy2(SOURCE_FILEPATH, DESTINATION_FILEPATH)
 		print("File updated!\n")
+		os.remove(SOURCE_FILEPATH)
 
 	else:
 		print("No Updates Avialable...\n")
