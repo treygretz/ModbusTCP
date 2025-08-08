@@ -9,5 +9,9 @@ MODBUS_PORT = 502
 FLASK_HOST = "10.190.54.222"
 FLASK_PORT = 8000
 
-# Time in seconds
-TRANSFER_DELAY = 30
+# Time in seconds for file transfer to complete
+TRANSFER_DELAY = 15
+
+MODBUS_STARTING_REGISTER = 1001
+TOTAL_CLIENTS = 32
+CLIENT_IP_RANGE = (1, 32)

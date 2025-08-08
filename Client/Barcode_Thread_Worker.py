@@ -4,7 +4,7 @@ import queue
 import datetime
 import evdev
 from pyModbusTCP.client import ModbusClient
-from config import MODBUS_HOST, MODBUS_PORT, FLASK_HOST, FLASK_PORT
+from config import MODBUS_HOST, MODBUS_PORT, FLASK_HOST, FLASK_PORT, MODBUS_STARTING_REGISTER, TOTAL_CLIENTS
 import subprocess
 import flask
 import requests
@@ -88,7 +88,7 @@ def sendPulse(client, retry_event):
             return
 
         serverIPRegister = parseIPtoRegister()
-        IPlist = client.read_holding_registers(1051, 26)
+        IPlist = client.read_holding_registers(MODBUS_STARTING_REGISTER, TOTAL_CLIENTS)
         print(f"{IPlist}\n")
         PulseRegister = None
 
@@ -118,7 +118,7 @@ def updateServerBarcodeRegisters(scanner, client, retry_event):
         while not retry_event.is_set():
             if not client.is_open:
                 raise ConnectionError("Lost Modbus Connection")
-			
+            
 			# Prevents the scanner from blocking so it can easily detect server disconnections
             event = scanner.read_one()
 
@@ -131,7 +131,7 @@ def updateServerBarcodeRegisters(scanner, client, retry_event):
                     if len(barcode) > 0:
                         print("Read: " + barcode)
                         serverIPRegister = parseIPtoRegister()
-                        IPlist = client.read_holding_registers(1051, 26)
+                        IPlist = client.read_holding_registers(MODBUS_STARTING_REGISTER, TOTAL_CLIENTS)
                         QRregister = None
                         for IP in IPlist:
                             if IP == serverIPRegister:

@@ -1,13 +1,10 @@
 # modbus_server.py
-import os
 import time
-import json
 import psutil
-import datetime
 import threading
 from pyModbusTCP.server import ModbusServer
 from utils import writeToLog
-from config import MODBUS_HOST, MODBUS_PORT, TRANSFER_DELAY
+from config import MODBUS_HOST, MODBUS_PORT, TRANSFER_DELAY, MODBUS_STARTING_REGISTER, TOTAL_CLIENTS, CLIENT_IP_RANGE
 
 # ModbusServer Object can be interacted with to start/stop the server and 
 # the file location registers are updated for the client to pull from via FTP
@@ -32,12 +29,12 @@ class ModbusServerThread:
             # Ensure the new file uploaded flag is set to false
             self.server.data_bank.set_holding_registers(1000, [0])
 
-            ip_addresses = [63 * 1000 + i for i in range(51, 77)]
-            self.server.data_bank.set_holding_registers(1051, ip_addresses)
+            ip_addresses = [63 * 1000 + i for i in range(*CLIENT_IP_RANGE)]
+            self.server.data_bank.set_holding_registers(MODBUS_STARTING_REGISTER, ip_addresses)
             print("IP addresses stored in registers.")
 
             while not self.stop_event.is_set():
-                for i in range(26):
+                for i in range(TOTAL_CLIENTS):
                     data = self.server.data_bank.get_holding_registers(i * 10, 9)
                     if data and data[0] != 0:
                         print(f"Data read from holding registers: {data}")
