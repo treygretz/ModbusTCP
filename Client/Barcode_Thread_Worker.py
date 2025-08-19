@@ -95,7 +95,7 @@ def sendPulse(client, retry_event):
 
         for IP in IPlist:
             if IP == serverIPRegister:
-                PulseRegister = IPlist.index(IP)
+                PulseRegister = IPlist.index(IP)+1
 
         if PulseRegister is not None:
             client.write_single_register((PulseRegister * 10) + 7, 1)
